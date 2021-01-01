@@ -1,18 +1,26 @@
 from bs4 import BeautifulSoup
 from datetime import date
-import datetime
+from datetime import datetime
 import requests
 # import json
 
 TODAY = date.today().strftime("%d-%m-%Y")
 
-def month_id_to_en(date_time):
+def convert_date(date_time):
     bulan = date_time[3:-5]
     dict_of_bulan = {
-        "Mei": "May",
-        "Agu": "Aug",
-        "Okt": "Oct",
-        "Des": "Dec"
+        "Jan": "01",
+        "Feb": "02",
+        "Mar": "03",
+        "Apr": "04",
+        "Mei": "05",
+        "Jun": "06",
+        "Jul": "07",
+        "Agu": "08",
+        "Sep": "09",
+        "Okt": "10",
+        "Nov": "11",
+        "Des": "12"
     }
 
     converted_month = dict_of_bulan.get(bulan, bulan)
@@ -34,8 +42,8 @@ def detik_sport_news():
 
         news_date_time = news_source.next_sibling.strip()
         first_whitespace = news_date_time.index(",")
-        news_date = news_date_time[first_whitespace+2:-10].replace(' ', '-')
-        news_date = month_id_to_en(news_date)
+        news_date = news_date_time[first_whitespace+2:-10].replace(' ', '-') # slicing the only one we need
+        news_date = convert_date(news_date) #convert indonesian month word to english
         news = {
             'title': news_title,
             'image': news_image,
@@ -51,7 +59,7 @@ def detik_sport_news():
 def goal_com_news():
     goal_com_html = requests.get('https://goal.com/id').text
     goal_com_soup = BeautifulSoup(goal_com_html, 'lxml')
-
+    
     goal_com_news_articles = goal_com_soup.find_all('table', {'class': 'card-type-article'})
     result = []
     for article in goal_com_news_articles:
@@ -94,8 +102,8 @@ def pandit_football_news():
     return result
 
 
-source1 = detik_sport_news()
-# source2 = goal_com_news()
+# source1 = detik_sport_news()
+source2 = goal_com_news()
 # source3 = pandit_football_news()
 
 # batch = []
