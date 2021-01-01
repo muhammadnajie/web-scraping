@@ -2,7 +2,8 @@ from bs4 import BeautifulSoup
 from datetime import date
 from datetime import datetime
 import requests
-# import json
+import json
+import random
 
 TODAY = date.today().strftime("%d-%m-%Y")
 
@@ -59,7 +60,7 @@ def detik_sport_news():
 def goal_com_news():
     goal_com_html = requests.get('https://goal.com/id').text
     goal_com_soup = BeautifulSoup(goal_com_html, 'lxml')
-    
+
     goal_com_news_articles = goal_com_soup.find_all('table', {'class': 'card-type-article'})
     result = []
     for article in goal_com_news_articles:
@@ -89,7 +90,7 @@ def pandit_football_news():
         news_title = article.header.h3.a.text
         news_link = article.header.h3.a['href']
         news_image = article.find('img')['src']
-        news_date = article.find('p', {'class': 'simple-share'}).text.replace('/', '-').strip()
+        news_date = article.find('p', {'class': 'simple-share'}).text.replace('/', '-').strip()[:-5]
         news = {
             'title': news_title.strip(),
             'image': news_image,
@@ -102,17 +103,26 @@ def pandit_football_news():
     return result
 
 
-# source1 = detik_sport_news()
+source1 = detik_sport_news()
 source2 = goal_com_news()
-# source3 = pandit_football_news()
+source3 = pandit_football_news()
 
-# batch = []
-# batch.extend(source1)
-# batch.extend(source2)
-# batch.extend(source3)
+batch = []
+batch.extend(source1)
+batch.extend(source2)
+batch.extend(source3)
 
-# print()
-# print(batch)
-# print(source1+source2+source3)
+print()
+print(batch)
 
-# print(type(source1))
+copy_of_batch = batch
+random.shuffle(copy_of_batch)
+
+with open(f"../data/{TODAY}.json", "w") as json_file:
+    json_file.write('')
+    json.dump(batch, json_file)
+
+NOW = datetime.now().strftime("%d-%m-%Y %H%M%S")
+with open(f"../data/{NOW}.json", "w") as json_file:
+    json_file.write('')
+    json.dump(copy_of_batch, json_file)
